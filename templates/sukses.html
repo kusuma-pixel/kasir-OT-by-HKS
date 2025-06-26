@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Transaksi Berhasil</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1 style="text-align:center; color:#03ac0e;">Transaksi Berhasil!</h1>
+        <div class="total">
+            Total Bayar: Rp{{ "{:,.0f}".format(total) }}
+        </div>
+        {% if qr %}
+        <div style="text-align:center; margin:24px 0;">
+            <img src="data:image/png;base64,{{ qr }}" alt="QRIS" style="max-width:200px;">
+            <div>Scan QRIS untuk pembayaran</div>
+        </div>
+        {% endif %}
+        <div class="kembali-wrapper">
+            <a href="{{ url_for('index') }}" class="btn-kembali">Kembali ke Beranda</a>
+        </div>
+    </div>
+</body>
+</html>

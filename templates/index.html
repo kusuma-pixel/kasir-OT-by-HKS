@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Daftar Produk</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Daftar Produk</h1>
+        <a href="{{ url_for('logout') }}" class="btn" style="float:right;">Logout</a>
+        {% if role == 'pemilik' %}
+<a href="{{ url_for('tambah_produk') }}" class="btn">+ Tambah Produk</a>
+{% endif %}
+        <form method="POST" action="{{ url_for('checkout') }}">
+            <table>
+                <tr>
+                    <th>Nama</th>
+                    <th>Harga</th>
+                    <th>Jumlah</th>
+                </tr>
+                {% for item in produk %}
+                <tr>
+                    <td>{{ item[1] }}</td>
+                    <td>Rp{{ "{:,.0f}".format(item[2]) }}</td>
+                    <td>
+                        <input type="number" name="qty_{{ item[0] }}" placeholder="0" min="0" style="width:60px;">
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+            <div style="margin-top:16px; text-align:center;">
+            <button type="submit" class="btn">Checkout</button>
+            </div>
+        </form>
+        <div style="margin-top:20px; text-align:center;">
+            <a href="{{ url_for('riwayat') }}">Lihat Riwayat Transaksi</a>
+        </div>
+    </div>
+    <script>
+    document.querySelectorAll('input[type="number"][placeholder="0"]').forEach(function(input) {
+        input.addEventListener('focus', function() {
+            if (input.value === "0") input.value = "";
+        });
+    });
+    </script>
+</body>
+</html>

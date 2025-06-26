@@ -1,0 +1,264 @@
+/* style.css */
+
+/* Umum */
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #f6f6f6;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 700px;
+    margin: 40px auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    padding: 32px 24px;
+}
+
+h1, h2, h3 {
+    color: #03ac0e;
+    text-align: center;
+    margin-top: 0;
+}
+
+a {
+    color: #03ac0e;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+.btn, .btn-kembali {
+    background: #03ac0e;
+    color: #fff !important;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-weight: bold;
+    cursor: pointer;
+    margin: 4px 0;
+    display: inline-block;
+    font-size: 1em;
+    transition: background 0.2s;
+    text-align: center;
+}
+
+.btn:hover, .btn-kembali:hover {
+    background: #02990c;
+}
+
+.kembali-wrapper, .sukses-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: 40px;
+}
+
+/* Tabel */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 16px;
+    background: #fff;
+}
+
+th, td {
+    padding: 10px 8px;
+    border-bottom: 1px solid #eee;
+    text-align: left;
+}
+
+th {
+    background: #e0ffe0;
+    color: #03ac0e;
+}
+
+input[type="number"] {
+    width: 60px;
+    padding: 4px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    text-align: center;
+    font-size: 1em;
+    background: #f9f9f9;
+}
+
+input[type="text"] {
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 1em;
+    background: #f9f9f9;
+}
+
+input[type="number"]:focus,
+input[type="text"]:focus,
+input[type="password"]:focus {
+    outline: 2px solid #03ac0e;
+    border-color: #03ac0e;
+}
+
+/* Login form styling */
+.login-container {
+    max-width: 350px;
+    margin: 80px auto 0 auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    padding: 32px 24px;
+}
+
+.login-container h2 {
+    text-align: center;
+    color: #03ac0e;
+    margin-bottom: 24px;
+    font-weight: bold;
+}
+
+
+input[type="text"], input[type="password"] {
+    width: 100%; /* Maksimal sesuai container */
+    padding: 12px 15px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+.login-container button[type="submit"] {
+    width: 100%;
+    background: #03ac0e;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 0;
+    font-weight: bold;
+    font-size: 1em;
+    cursor: pointer;
+    margin-top: 5px;
+    transition: background 0.2s;
+}
+
+.login-container button[type="submit"]:hover {
+    background: #02990c;
+}
+
+.login-container p {
+    color: red;
+    text-align: center;
+    margin-top: 10px;
+    margin-bottom: 0;
+}
+
+/* Form tambah produk */
+.input-label {
+    font-weight: bold;
+    margin-bottom: 4px;
+    color: #03ac0e;
+}
+
+.input-produk {
+    width: 260px;
+    padding: 8px;
+    margin-bottom: 16px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 1em;
+    background: #f9f9f9;
+}
+
+.btn-tambah {
+    width: 120px;
+    padding: 10px;
+    background: #03ac0e;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    margin-bottom: 18px;
+}
+
+.btn-tambah:hover {
+    background: #02990c;
+}
+
+.kembali-link {
+    display: block;
+    margin-top: 10px;
+    color: #03ac0e;
+    text-align: center;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.kembali-link:hover {
+    text-decoration: underline;
+}
+
+/* Checkout & total */
+.selected {
+    background: #e0ffe0;
+    font-weight: bold;
+    border-radius: 6px;
+    margin-bottom: 6px;
+    padding: 8px;
+}
+
+.total {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin: 24px 0 16px 0;
+    text-align: center;
+    color: #03ac0e;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .container {
+        padding: 12px 4px;
+    }
+    table, th, td {
+        font-size: 14px;
+    }
+    h1, h2, h3 {
+        font-size: 1.2em;
+    }
+    .login-container {
+        padding: 16px 4px;
+    }
+}
+
+/* Dropdown metode pembayaran sesuai tema */
+select[name="metode"] {
+    width: 100%;
+    padding: 10px 14px;
+    margin: 16px 0 22px 0;
+    border-radius: 8px;
+    border: 1.5px solid #03ac0e;
+    font-size: 1em;
+    background: #f6fff6;
+    color: #222;
+    box-sizing: border-box;
+    appearance: none;
+    transition: border 0.2s, box-shadow 0.2s;
+}
+
+select[name="metode"]:focus {
+    border: 2px solid #03ac0e;
+    box-shadow: 0 0 0 2px #e0ffe0;
+    outline: none;
+}
+
+form label[for="metode"] {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: bold;
+    color: #03ac0e;
+    letter-spacing: 0.5px;
+}

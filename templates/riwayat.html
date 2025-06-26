@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Riwayat Transaksi</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <h1>Riwayat Transaksi</h1>
+    <table>
+        <tr><th>ID</th><th>Nama Produk</th><th>Jumlah</th><th>Total</th><th>Metode</th><th>Tanggal</th></tr>
+        {% for row in data %}
+        <tr>
+            <td>{{ row[0] }}</td>
+            <td>{{ row[1] }}</td>
+            <td>{{ row[2] }}</td>
+            <td>{{ row[3] }}</td>
+            <td>{{ row[4] }}</td>
+            <td>{{ row[5] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <div class="kembali-wrapper">
+        <a href="{{ url_for('index') }}" class="btn-kembali">Kembali ke Menu Utama</a>
+    </div>
+</body>
+</html>

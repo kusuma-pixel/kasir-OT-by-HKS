@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <title>Checkout</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .selected {
+            background: #e0ffe0;
+            font-weight: bold;
+        }
+        .not-selected {
+            background: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Checkout</h1>
+        <h3>Produk di Keranjang</h3>
+        <ul>
+            {% for item in keranjang %}
+            <li class="selected">
+                {{ item['nama'] }} (x{{ item['qty'] }}) - Rp{{ "{:,.0f}".format(item['harga'] * item['qty']) }}
+            </li>
+            {% endfor %}
+        </ul>
+        <div class="total">
+            Total: Rp{{ "{:,.0f}".format(total) }}
+        </div>
+        
+        <form action="{{ url_for('bayar') }}" method="POST">
+            <label for="metode">Metode Pembayaran:</label>
+            <select id="metode" name="metode" required>
+                <option value="Tunai">Tunai</option>
+                <option value="Kartu Kredit">Kartu Kredit</option>
+                <option value="Transfer Bank">Transfer Bank</option>
+                <option value="QRIS">QRIS</option>
+            </select>
+            <div style="text-align:center;">
+    <button type="submit" class="btn btn-bayar">Bayar</button>
+</div>
+        </form>
+        <div style="text-align:center; margin-top:16px;">
+    <a href="{{ url_for('index') }}" class="btn-batal">Batal</a>
+</div>
+    </div>
+</body>
+</html>
