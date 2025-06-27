@@ -6,23 +6,23 @@ import pandas as pd
 from apscheduler.schedulers.background import BackgroundScheduler
 import pytz
 
-print("Database path:", os.path.abspath('kasir.db'))
-
+# --- Konfigurasi Awal ---
 app = Flask(__name__)
 app.secret_key = 'rahasia_anda'
 
+# --- Inisialisasi Database ---
+print("Database path:", os.path.abspath('kasir.db'))
 conn = sqlite3.connect('kasir.db', check_same_thread=False)
 cursor = conn.cursor()
-cursor.execute('''CREATE TABLE IF NOT EXISTS produk (id INTEGER PRIMARY KEY, nama TEXT, harga INTEGER)''')
-# Tambahkan kolom username jika belum ada
-cursor.execute("PRAGMA table_info(transaksi)")
-columns = [col[1] for col in cursor.fetchall()]
-if 'username' not in columns:
-    try:
-        cursor.execute("ALTER TABLE transaksi ADD COLUMN username TEXT")
-        conn.commit()
-    except:
-        pass
+
+# --- Buat Tabel Produk ---
+cursor.execute('''CREATE TABLE IF NOT EXISTS produk (
+    id INTEGER PRIMARY KEY,
+    nama TEXT,
+    harga INTEGER
+)''')
+
+# --- Buat Tabel Transaksi (dengan username) ---
 cursor.execute('''CREATE TABLE IF NOT EXISTS transaksi (
     id INTEGER PRIMARY KEY,
     nama_produk TEXT,
@@ -32,6 +32,8 @@ cursor.execute('''CREATE TABLE IF NOT EXISTS transaksi (
     tanggal TEXT,
     username TEXT
 )''')
+
+# --- Buat Tabel Pengguna ---
 cursor.execute('''CREATE TABLE IF NOT EXISTS pengguna (
     id INTEGER PRIMARY KEY,
     username TEXT UNIQUE,
@@ -39,7 +41,7 @@ cursor.execute('''CREATE TABLE IF NOT EXISTS pengguna (
     role TEXT
 )''')
 
-# Tambahkan user jika belum ada
+# --- Tambahkan Pengguna Default ---
 users = [
     ('denis', 'admin', 'pemilik'),
     ('almas', 'kr1', 'karyawan'),
@@ -51,6 +53,7 @@ for u in users:
     cursor.execute('INSERT OR IGNORE INTO pengguna (username, password, role) VALUES (?, ?, ?)', u)
 conn.commit()
 
+# --- Routing Login ---
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     error = None
@@ -68,25 +71,28 @@ def login():
             error = "Username atau password salah"
     return render_template('login.html', error=error)
 
+# --- Halaman Utama ---
 @app.route('/')
 def index():
     if 'username' not in session:
         return redirect(url_for('login'))
     cursor.execute('SELECT * FROM produk')
     produk = cursor.fetchall()
-    return render_template('index.html', produk=produk, role=session.get('role'))
+    return render_template('index.html', produk=produk, role=session.get('role'), username=session.get('username'))
 
+# --- Logout ---
 @app.route('/logout')
 def logout():
     session.clear()
     return redirect(url_for('login'))
 
+# --- Tambah Produk (Pemilik Saja) ---
 @app.route('/tambah_produk', methods=['GET', 'POST'])
 def tambah_produk():
     if 'username' not in session:
         return redirect(url_for('login'))
     if session.get('role') != 'pemilik':
-        return redirect(url_for('index'))  # Hanya pemilik yang boleh akses
+        return redirect(url_for('index'))
     if request.method == 'POST':
         nama = request.form['nama']
         harga_input = request.form['harga']
@@ -95,8 +101,9 @@ def tambah_produk():
         cursor.execute('INSERT INTO produk (nama, harga) VALUES (?, ?)', (nama, harga))
         conn.commit()
         return redirect(url_for('index'))
-    return render_template('tambah_produk.html')
+    return render_template('tambah_produk.html', username=session.get('username'))
 
+# --- Checkout ---
 @app.route('/checkout', methods=['POST'])
 def checkout():
     if 'username' not in session:
@@ -117,8 +124,9 @@ def checkout():
         return redirect(url_for('index'))
     session['keranjang'] = keranjang
     session['total'] = total
-    return render_template('checkout.html', keranjang=keranjang, total=total)
+    return render_template('checkout.html', keranjang=keranjang, total=total, username=session.get('username'))
 
+# --- Bayar ---
 @app.route('/bayar', methods=['POST'])
 def bayar():
     if 'username' not in session:
@@ -128,31 +136,57 @@ def bayar():
     keranjang = session.get('keranjang', [])
     tanggal = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     username = session.get('username', '-')
-    # Simpan transaksi per produk
     for item in keranjang:
-        cursor.execute('INSERT INTO transaksi (nama_produk, jumlah, total, metode, tanggal, username) VALUES (?, ?, ?, ?, ?, ?)',
-                       (item['nama'], item['qty'], item['harga'] * item['qty'], metode, tanggal, username))
+        cursor.execute(
+            'INSERT INTO transaksi (nama_produk, jumlah, total, metode, tanggal, username) VALUES (?, ?, ?, ?, ?, ?)',
+            (item['nama'], item['qty'], item['harga'] * item['qty'], metode, tanggal, username)
+        )
     conn.commit()
     session.pop('keranjang', None)
     session.pop('total', None)
-    return render_template('sukses.html', total=total, qr=None)
+    return render_template('sukses.html', total=total, qr=None, username=username)
 
+# --- Riwayat Transaksi ---
 @app.route('/riwayat')
 def riwayat():
     if 'username' not in session:
         return redirect(url_for('login'))
-    cursor.execute('SELECT * FROM transaksi')
-    data = cursor.fetchall()
-    return render_template('riwayat.html', data=data)
+    role = session.get('role')
+    username = session.get('username')
+    if role == 'pemilik':
+        cursor.execute("SELECT username FROM pengguna")
+        users = [row[0] for row in cursor.fetchall()]
+        filter_user = request.args.get('user', None)
+        if filter_user:
+            cursor.execute('SELECT * FROM transaksi WHERE username = ?', (filter_user,))
+        else:
+            cursor.execute('SELECT * FROM transaksi')
+        data = cursor.fetchall()
+    else:
+        users = [username]
+        filter_user = username
+        cursor.execute('SELECT * FROM transaksi WHERE username = ?', (username,))
+        data = cursor.fetchall()
+    return render_template('riwayat.html', data=data, users=users, filter_user=filter_user, role=role, username=username)
 
+# --- Ekspor ke Excel Tiap Malam ---
 def export_transaksi_to_excel():
-    cursor.execute('SELECT id, nama_produk, jumlah, total, metode, tanggal, username FROM transaksi')
-    data = cursor.fetchall()
-    columns = ['ID', 'Nama Produk', 'Jumlah', 'Total', 'Metode', 'Tanggal', 'Karyawan']
-    df = pd.DataFrame(data, columns=columns)
-    df.to_excel('riwayat_transaksi.xlsx', index=False)
+    cursor.execute("SELECT username FROM pengguna")
+    users = [row[0] for row in cursor.fetchall()]
+    with pd.ExcelWriter('riwayat_transaksi.xlsx') as writer:
+        for user in users:
+            cursor.execute('''
+                SELECT id, nama_produk, jumlah, total, metode, tanggal, username
+                FROM transaksi
+                WHERE username = ?
+            ''', (user,))
+            data = cursor.fetchall()
+            columns = ['ID', 'Nama Produk', 'Jumlah', 'Total', 'Metode', 'Tanggal', 'Karyawan']
+            df = pd.DataFrame(data, columns=columns)
+            df.to_excel(writer, sheet_name=user, index=False)
     print("Riwayat transaksi berhasil diekspor ke Excel.")
 
+# --- Scheduler Jalan Otomatis ---
 def start_scheduler():
     scheduler = BackgroundScheduler(timezone=pytz.timezone('Asia/Jakarta'))
     scheduler.add_job(export_transaksi_to_excel, 'cron', hour=22, minute=30)
@@ -160,5 +194,6 @@ def start_scheduler():
 
 start_scheduler()
 
+# --- Jalankan App ---
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')

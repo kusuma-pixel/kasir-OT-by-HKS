@@ -8,8 +8,31 @@
 </head>
 <body>
     <h1>Riwayat Transaksi</h1>
+
+    {% if role == 'pemilik' %}
+    <form method="get" style="margin-bottom:16px;">
+        <label for="user">Filter karyawan:</label>
+        <select name="user" id="user" onchange="this.form.submit()">
+            <option value="">Semua</option>
+            {% for user in users %}
+            <option value="{{ user }}" {% if filter_user == user %}selected{% endif %}>{{ user }}</option>
+            {% endfor %}
+        </select>
+    </form>
+    {% else %}
+    <p><span class="karyawan-label">{{ users[0] }}</span></p>
+    {% endif %}
+
     <table>
-        <tr><th>ID</th><th>Nama Produk</th><th>Jumlah</th><th>Total</th><th>Metode</th><th>Tanggal</th></tr>
+        <tr>
+            <th>ID</th>
+            <th>Nama Produk</th>
+            <th>Jumlah</th>
+            <th>Total</th>
+            <th>Metode</th>
+            <th>Tanggal</th>
+            <th>Karyawan</th>
+        </tr>
         {% for row in data %}
         <tr>
             <td>{{ row[0] }}</td>
@@ -18,11 +41,12 @@
             <td>{{ row[3] }}</td>
             <td>{{ row[4] }}</td>
             <td>{{ row[5] }}</td>
+            <td>{{ row[6] }}</td>
         </tr>
         {% endfor %}
     </table>
     <div class="kembali-wrapper">
-        <a href="{{ url_for('index') }}" class="btn-kembali">Kembali ke Menu Utama</a>
+        <a href="{{ url_for('index') }}" class="btn">← Kembali ke Menu Utama</a>
     </div>
 </body>
 </html>

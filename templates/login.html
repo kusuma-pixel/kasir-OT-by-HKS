@@ -1,20 +1,24 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
+    <meta charset="UTF-8">
     <title>Login Kasir</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta charset="UTF-8">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <div class="login-container">
-        <h2>Login</h2>
+        <h2>Login Kasir</h2>
         <form method="post">
-            <input type="text" name="username" placeholder="Username" required>
-            <input type="password" name="password" placeholder="Password" required>
+            <label for="username">Username</label>
+            <input type="text" name="username" id="username" required autofocus autocomplete="username">
+
+            <label for="password">Password</label>
+            <input type="password" name="password" id="password" required autocomplete="current-password">
+
             <button type="submit">Login</button>
             {% if error %}
-            <p>{{ error }}</p>
+            <div class="error-msg">{{ error }}</div>
             {% endif %}
         </form>
     </div>

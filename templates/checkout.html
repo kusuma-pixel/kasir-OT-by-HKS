@@ -1,50 +1,80 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8">
     <title>Checkout</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <style>
-        .selected {
+        .user-login-box {
+            position: absolute;
+            top: 28px;
+            right: 48px;
             background: #e0ffe0;
-            font-weight: bold;
+            color: #168a2c;
+            border: 1.5px solid #03AC0E;
+            border-radius: 8px;
+            padding: 8px 22px;
+            font-family: 'Poppins', Arial, sans-serif;
+            font-weight: 600;
+            font-size: 1em;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 8px rgba(3,172,14,0.07);
+            z-index: 10;
         }
-        .not-selected {
-            background: #f0f0f0;
+        @media (max-width: 600px) {
+            .user-login-box {
+                right: 12px;
+                top: 12px;
+                padding: 6px 12px;
+                font-size: 0.98em;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Checkout</h1>
-        <h3>Produk di Keranjang</h3>
-        <ul>
-            {% for item in keranjang %}
-            <li class="selected">
-                {{ item['nama'] }} (x{{ item['qty'] }}) - Rp{{ "{:,.0f}".format(item['harga'] * item['qty']) }}
-            </li>
-            {% endfor %}
-        </ul>
-        <div class="total">
-            Total: Rp{{ "{:,.0f}".format(total) }}
-        </div>
-        
-        <form action="{{ url_for('bayar') }}" method="POST">
-            <label for="metode">Metode Pembayaran:</label>
-            <select id="metode" name="metode" required>
-                <option value="Tunai">Tunai</option>
-                <option value="Kartu Kredit">Kartu Kredit</option>
-                <option value="Transfer Bank">Transfer Bank</option>
-                <option value="QRIS">QRIS</option>
-            </select>
-            <div style="text-align:center;">
-    <button type="submit" class="btn btn-bayar">Bayar</button>
-</div>
-        </form>
-        <div style="text-align:center; margin-top:16px;">
-    <a href="{{ url_for('index') }}" class="btn-batal">Batal</a>
-</div>
+<div class="container">
+    <div class="user-login-box">
+        {{ session['username'] }}
     </div>
+    <h1 style="margin-top:38px;">Checkout</h1>
+    <form method="post">
+        <div class="produk-wrapper">
+            <table>
+                <tr>
+                    <th>Nama Produk</th>
+                    <th>Jumlah</th>
+                    <th>Harga</th>
+                    <th>Total</th>
+                </tr>
+                {% for item in keranjang %}
+                <tr>
+                    <td>{{ item.nama }}</td>
+                    <td>{{ item.qty }}</td>
+                    <td>Rp {{ "{:,.0f}".format(item.harga) }}</td>
+                    <td>Rp {{ "{:,.0f}".format(item.harga * item.qty) }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+        <div class="total" style="margin-top:18px;">
+            <b>Total Bayar: Rp {{ "{:,.0f}".format(total) }}</b>
+        </div>
+        <div style="margin: 28px 0 18px 0;">
+            <label for="metode">Metode Pembayaran</label>
+            <select name="metode" id="metode" required>
+                <option value="" disabled selected>Pilih Metode</option>
+                <option value="Tunai">Tunai</option>
+                <option value="QRIS">QRIS</option>
+                <option value="Debit">Debit</option>
+                <option value="Kredit">Kredit</option>
+            </select>
+        </div>
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 14px; margin-top: 24px;">
+            <button type="submit" class="btn" style="width: 220px; border: 1.5px solid #03AC0E; border-radius: 8px; font-size: 1.08em;">Bayar</button>
+            <a href="{{ url_for('index') }}" class="btn-kembali" style="width: 220px; border: 1.5px solid #03AC0E; border-radius: 8px; font-size: 1.08em; text-align: center;">Kembali</a>
+        </div>
+    </form>
+</div>
 </body>
 </html>
